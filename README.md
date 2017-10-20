@@ -2,7 +2,6 @@
 Random Forest Classification Equities Prediction Algorithm
 ------
 This a random forest classification prediction algorithm which is designed to predict a stocks future increase in price (based on % of price increase in the future). This model approaches the future market as a classification problem. Rather than try to predict an exact stock price it predicts a category of percent change. The default is to make this prediction 20 days out.
-+ As I am writing this I am wondering if it would have been better to predict pps change than % change. Since percent change is a function of the price and I wonder if the overall change of a stock changes as it gets bigger, or does the change in percentage remain the same but the PPS changes (i.e. smaller changes with cheaper stocks and bigger changes with more expensive stocks). Something to look into further.
 
  The demonstration predicts VTI ([Vanguard Total Stock Market Index Fund](https://finance.google.com/finance?q=VTI&ei=NlrpWeD3IYb3jAGCi5ewCg)) from technical indicators taken from OHLCV data from VTI, BND ([Vanguard Total US Bond Index Fund](https://finance.google.com/finance?q=BND&ei=c1rpWaH9NIvNjAGE2YjQBw)), SH ([ProShares Short S&P500](https://finance.google.com/finance?q=SH&ei=eFrpWenXD4PG2AbAqYfACw)) and GLD ([SPDR Gold Trust](https://finance.google.com/finance?q=GLD&ei=o1rpWZiGJYOVjAGS3pegCQ)). 
  + _Note:_ I am predicting VTI based on VTIs own technical indicators and those of other contra-indicators for the general stock market (i.e. price of gold, US bond market, an inverse traded fund)
@@ -19,6 +18,8 @@ This a random forest classification prediction algorithm which is designed to pr
  +  0.09% to  99%
 
  In the VTI model, categorical probabilities are summed if they are below -0.01%, and this corresponds to the probability of SELL action. The probability of being between -0.01% and 0.01% corresponds to the STAY action. The summed categorical probability of being above 0.01% corresponds to the buy action.
+
+ _Note:_ I have also added a google example prediction (See /GOOGLE folder)
 
 There are a number of functions that are highly customizable in the /LIB folder. The main functions are 
 + stocks.pre.process()

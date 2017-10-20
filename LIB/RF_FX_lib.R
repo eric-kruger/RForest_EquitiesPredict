@@ -27,9 +27,11 @@ Combine.ls.by.date.2.df <- function(ls,BY="Date") {
     # ls <- sd
     # BY <- "Date"
   out <- ls[[1]]
+  if(length(ls)>1) {
   i <- 2
   for (i in 2:length(ls)) {
    out <- merge(out,ls[[i]],by=BY)
+  }
   }
   return(out)
 }
@@ -609,7 +611,7 @@ policy.test <- function(performance.obj,        # Performance object specified a
     runc <- cbind.data.frame(Position=type,Price.start,Price.end,change,start.date,end.date,w.start,w.end,run.length)
     runc$MATCH <- with(runc,ifelse(Position=="CASH" & change < 0,TRUE,
                                    ifelse(Position=="STOCKS" & change >=0,TRUE,FALSE)))
-    Cycle.Error <- 1-sum(runc$MATCH)/nrow(runc)
+    Cycle.Error <- 1-sum(runc$MATCH,na.rm = TRUE)/(nrow(runc)-sum(is.na(runc$MATCH)))
     output[["policy.predict"]]   <- p.df
     output[["Cycle.metrics"]]    <- runc
     output[["Cycle.Error"]]      <- Cycle.Error
