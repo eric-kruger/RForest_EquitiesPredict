@@ -1,5 +1,5 @@
 # Directory Setup
-source("~/R/RForest_EquitiesPredict/VTI2/SETUP.R")
+source("~/R/RForest_EquitiesPredict/VTI/SETUP.R")
 
 # Load Training Data
   source(paths$path.lib)
@@ -17,7 +17,7 @@ source("~/R/RForest_EquitiesPredict/VTI2/SETUP.R")
                       trees=1500)
   mod
 # Save Data
-  save(personal,paths,mod,file=paste0(paths$path.dir,"/MODEL.Rdata"))
+  #save(personal,paths,mod,file=paste0(paths$path.dir,"/MODEL.Rdata"))
   
 # Evaluate Variable importance
   impt <- importance(mod$model,type=2)

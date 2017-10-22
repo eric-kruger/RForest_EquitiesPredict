@@ -67,9 +67,9 @@ computer.name <- Sys.info()["nodename"]
   tab.email.t <- paste0(tab3,"\n")
   tab.email.t <- paste(tab.email.t,collapse="")
   
-  WARNING.SELL.VTI <- FALSE
+  WARNING.SELL <- FALSE
   if(prediction$Pred.Action[1]=="SELL") {WARNING.SELL <- TRUE}
-  WARNING.BUY.VTI <- FALSE
+  WARNING.BUY <- FALSE
   if(prediction$Pred.Action[1]=="BUY")  {WARNING.BUY <- TRUE}
 ```
 

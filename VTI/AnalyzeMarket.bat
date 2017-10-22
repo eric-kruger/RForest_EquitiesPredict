@@ -1,2 +1,2 @@
-Rscript --vanilla D:\Documents\R\DataHouse\Financial\AnalyzeMarket.R
+Rscript --vanilla D:\Documents\R\RForest_EquitiesPredict\VTI\AnalyzeMarket.R
 pause

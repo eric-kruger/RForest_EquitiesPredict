@@ -1,4 +1,4 @@
-source("~/R/RForest_EquitiesPredict/VTI2/SETUP.R")
+source("~/R/RForest_EquitiesPredict/VTI/SETUP.R")
 source(paths$path.lib)
 library(rmarkdown)
 
