@@ -32,7 +32,7 @@ source("~/R/RForest_EquitiesPredict/GOOGL/SETUP.R")
   pred
 
 # Performance (Evaluate performance of prediction)
-  perf <- stock.RF.performance(predict.obj=pred,sell.max = -0.01,stay.max = 0.01,buy.max = 99,sell.t=0.86,buy.t=0.4)
+  perf <- stock.RF.performance(predict.obj=pred,sell.max = -0.01,stay.max = 0.01,buy.max = 99,sell.t=0.6,buy.t=0.6)
   perf
 
 # Policy (Evaluate performance of model based on a specific investment policy)

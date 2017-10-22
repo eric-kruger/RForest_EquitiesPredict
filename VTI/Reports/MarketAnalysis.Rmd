@@ -112,39 +112,16 @@ write.csv(pred$predict.data,paste0(paths$path.history,"/",mod$stock2model,"_pred
 
 ```{r}
 # 40 days back
-  p.df <- pol$policy.predict
-  p.df <- p.df[nrow(p.df):(nrow(p.df)-40),]
-  p.df <- arrange(p.df,Date)
-  p.df$Date <- as.Date(as.character(p.df$Date))
-  
-  p1 <- ggplot(data=p.df,aes(x=Date,y=Close.price)) + scale_color_manual(values=rev(hue_pal()(2)))  + geom_vline(mapping=aes(xintercept = Date,color=Position),size=2) + geom_line(size=1.5) + theme_bw() +ggtitle("40 days back") 
-  p1
+  position.plot(pol$policy.predict,days.back.window = 40)
 
 # 6 mo back
-  p.df <- pol$policy.predict
-  p.df <- p.df[nrow(p.df):(nrow(p.df)-150),]
-  p.df <- arrange(p.df,Date)
-  p.df$Date <- as.Date(as.character(p.df$Date))
-  
-  p1 <- ggplot(data=p.df,aes(x=Date,y=Close.price)) + scale_color_manual(values=rev(hue_pal()(2))) + geom_vline(mapping=aes(xintercept = Date,color=Position),size=2) + geom_line(size=1.5) + theme_bw() +ggtitle("150 days back") + scale_color_manual(values=hue_pal()(2))
-  p1
+  position.plot(pol$policy.predict,days.back.window = 150)
 
 # One Year Back
-  p.df <- pol$policy.predict
-  p.df <- p.df[nrow(p.df):(nrow(p.df)-365),]
-  p.df <- arrange(p.df,Date)
-  p.df$Date <- as.Date(as.character(p.df$Date))
-  
-  p1 <- ggplot(data=p.df,aes(x=Date,y=Close.price)) + scale_color_manual(values=rev(hue_pal()(2))) + geom_vline(mapping=aes(xintercept = Date,color=Position),size=2) + geom_line(size=1.5) + theme_bw() +ggtitle("One year back") + scale_color_manual(values=hue_pal()(2))
-  p1
+  position.plot(pol$policy.predict,days.back.window = 365)
 
 # All data
-  p.df <- pol$policy.predict
-  p.df <- arrange(p.df,Date)
-  p.df$Date <- as.Date(as.character(p.df$Date))
-  
-  p1 <- ggplot(data=p.df,aes(x=Date,y=Close.price)) + scale_color_manual(values=rev(hue_pal()(2))) + geom_vline(mapping=aes(xintercept = Date,color=Position),size=2) + geom_line(size=0.5) + theme_bw() +ggtitle("All Data") + scale_color_manual(values=hue_pal()(2))
-  p1
+  position.plot(pol$policy.predict,days.back.window = "ALL")
 ```
 
 # Daily Intraday Trading Report

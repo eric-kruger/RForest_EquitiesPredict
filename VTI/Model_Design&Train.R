@@ -17,7 +17,7 @@ source("~/R/RForest_EquitiesPredict/VTI/SETUP.R")
                       trees=1500)
   mod
 # Save Data
-  #save(personal,paths,mod,file=paste0(paths$path.dir,"/MODEL.Rdata"))
+  save(personal,paths,mod,file=paste0(paths$path.dir,"/MODEL.Rdata"))
   
 # Evaluate Variable importance
   impt <- importance(mod$model,type=2)
@@ -32,7 +32,7 @@ source("~/R/RForest_EquitiesPredict/VTI/SETUP.R")
   pred
 
 # Performance (Evaluate performance of prediction)
-  perf <- stock.RF.performance(predict.obj=pred,sell.max = -0.01,stay.max = 0.01,buy.max = 99,sell.t=0.86,buy.t=0.4)
+  perf <- stock.RF.performance(predict.obj=pred,sell.max = -0.01,stay.max = 0.01,buy.max = 99,sell.t=0.6,buy.t=0.6)
   perf
 
 # Policy (Evaluate performance of model based on a specific investment policy)

@@ -41,16 +41,34 @@ Combine.ls.by.date.2.df <- function(ls,BY="Date") {
 # This calcualtes the schaff trading indicator
   
 STC <- function(x,EMA.long=50,EMA.short=23,n.stoch=10) {
+  #Script Debugging
+    x <- as.numeric(GE$GE.Close)
+    EMA.long=50
+    EMA.short=23
+    n.stoch=10
   EMA.s                <- EMA(x,n=EMA.short)
   EMA.l                <- EMA(x,n=EMA.long)
   MACD                 <- EMA.s-EMA.l
   S1                   <- as.data.frame(stoch(MACD,nFastK=n.stoch,nFastD=n.stoch))
   S1$fastD[S1$fastD<0] <- 0
   S1$fastD[S1$fastD>1] <- 1
-  S2                   <- as.data.frame(stoch(S1$fastD*100,nFastK=10,nFastD=10))
-  S2$fastD[S2$fastD<0] <- 0
-  S2$fastD[S2$fastD>1] <- 1
-  STC                  <- S2$fastD*100
+  L                    <- runMin(S1$fastD,n=10)
+  H                    <- runMax(S1$fastD,n=10)
+  n                    <- H-L
+  fastK                <- ifelse(n>0,(S1$fastD-L/H)*100,0)                 # This indicator is buggy here and needs more debugging
+  S2                   <- EMA(fastK,n=10)
+  
+  
+  
+  S2                   <- rep(NA,nrow(S1))
+  s.data               <- max(which(is.na(S1$fastD)==TRUE))+1
+  e.data               <- nrow(S1)
+  S1fastd              <- S1$fastD[s.data:e.data]*100
+  S.temp               <- as.data.frame(stoch(S1fastd,nFastK=15,nFastD=10))  # This line tends to produce errors
+  S2[s.data:e.data]    <- S.temp$fastD
+  S2[S2<0]             <- 0
+  S2[S2>1]             <- 1
+  STC                  <- S2*100
   return(STC)
 }
   
@@ -157,7 +175,7 @@ stocks.pre.process <- function(symbols,        # Stocks to download or a list of
     # Add Technical Indicators
       # Schaff Trading Cycle
         HLC    <- c("High.ema","Low.ema","Close.ema")
-        df$STC <- STC(df$Close.raw,EMA.short = 9,EMA.long = 30)
+        #df$STC <- STC(df$Close.raw,EMA.short = 9,EMA.long = 30)
       # Aroon 
         A.s    <- aroon(df$Close.ema,n=20)  # Short
         colnames(A.s) <- paste0(colnames(A.s),".s")
@@ -341,8 +359,8 @@ stock.RF.performance <- function(predict.obj,     # Prediction object
     # s    <-  sell.max  <- -0.01  # Max Sell Value
     # st   <-  stay.max  <-  0.01  # Max Stay Value
     # b    <-  buy.max   <-  99    # Max Buy  Value
-    # sell.t <- 0.85               # Threshold prob to sell
-    # buy.t  <- 0.85               # Threshold prob to buy  
+    # sell.t <- 0.6               # Threshold prob to sell
+    # buy.t  <- 0.6               # Threshold prob to buy
   
   s    <-  sell.max  # Threshold max prob to sell
   st   <-  stay.max  # Threshold max prob to stay 
@@ -476,9 +494,9 @@ policy.test <- function(performance.obj,        # Performance object specified a
                         Shares.start=0,         # How many shares to start with
                         trade.cost=6.95) {      # Trad cost
  # Function Debugging
-   # performance.obj           <- perf
-   # Bank   <- Bank.start      <- 10000
-   # shares <- Shares.start    <- 0
+   performance.obj           <- perf
+   Bank   <- Bank.start      <- 10000
+   shares <- Shares.start    <- 0
   
   Bank   <- Bank.start      
   shares <- Shares.start   
@@ -617,6 +635,30 @@ policy.test <- function(performance.obj,        # Performance object specified a
     output[["Cycle.Error"]]      <- Cycle.Error
   return(output)
 }
+
+#---------------------------------------------------------------------------------------------------------------------#
+# Position Plots by dayback window
+
+position.plot <- function(p.df,days.back.window=40) {
+  # p.df <- pol$policy.predict
+  # days.back.window <- 40
+  if(days.back.window=="ALL") {
+  } else {
+        p.df <- p.df[nrow(p.df):(nrow(p.df)-days.back.window),]
+    } 
+  p.df$COLOR <- ifelse(p.df$Position=="STOCKS","#00BFC4","#F8766D")
+  p.df <- arrange(p.df,Date)
+  p.df$Date <- as.Date(as.character(p.df$Date))
+  
+  p1 <- ggplot(data=p.df,aes(x=Date,y=Close.price)) + 
+    geom_vline(mapping=aes(xintercept = Date,color=Position),size=2,color=p.df$COLOR) + 
+    geom_line(size=1.5) + 
+    theme_bw() +
+    ggtitle(paste0(days.back.window," days back"))
+  return(p1)
+}
+
+
 
 #---------------------------------------------------------------------------------------------------------------------#
 # Download Intraday stock information (used currently only in plotting)
