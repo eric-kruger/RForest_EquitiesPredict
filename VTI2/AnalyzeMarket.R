@@ -1,32 +1,39 @@
-source("~/R/RForest_EquitiesPredict/LIB/RF_FX_lib.R")
+source("~/R/RForest_EquitiesPredict/VTI2/SETUP.R")
+source(paths$path.lib)
 library(rmarkdown)
 
 Today <- weekdays(Sys.Date())
 
 if(Today %in% c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")) {
   
-  rmarkdown::render("~/R/RForest_EquitiesPredict/VTI/Reports/MarketAnalysis.Rmd")
+  rmarkdown::render(paste0(paths$path.report,"/MarketAnalysis.Rmd"))
   
-  #Google Credentials
-  EMAIL      <- "{insert full gmail here}"   # Your full email adddress to be sent to
-  UserName   <- "{insert google user name}"  # User name is everything before @
-  password   <- "{insert password}"          # Custom app password for gmail (needs to be set up in app passwords)
+  if(is.na(personal)==TRUE) {
+    #Google Credentials
+    EMAIL      <- "{insert full gmail here}"   # Your full email adddress to be sent to
+    UserName   <- "{insert google user name}"  # User name is everything before @
+    password   <- "{insert password}"          # Custom app password for gmail (needs to be set up in app passwords)
+  } else {
+    EMAIL    <- personal$V1[1]
+    UserName <- personal$V1[2]
+    password <- personal$V1[3]
+  }
   
   mailR::send.mail(from = "Pirate.Analysis@ARRRRH.com",
                    to = EMAIL,
-                   subject = "VTI Analysis",
+                   subject = paste0(directory," Analysis"),
                    body = tab.email.t,
                    smtp = list(host.name = "smtp.gmail.com", port = 465, user.name = UserName, passwd = password, ssl = TRUE),
                    authenticate = TRUE,
                    send = TRUE, 
-                   attach.files = "~/R/RForest_EquitiesPredict/VTI/Reports/MarketAnalysis.html",
+                   attach.files = paste0(paths$path.report,"/MarketAnalysis.html"),
                    debug=FALSE)
   
-  if(WARNING.SELL.VTI==TRUE) {
+  if(WARNING.SELL==TRUE) {
     mailR::send.mail(from = "Pirate.Analysis@ARRRRH.com",
                      to = EMAIL,
-                     subject = "SELL WARNING VTI",
-                     body = "WARNING SELL",
+                     subject = paste0("SELL NOTIFICATION: ",directory),
+                     body = paste0("SELL NOTIFICATION: ",directory),
                      smtp = list(host.name = "smtp.gmail.com", port = 465, user.name = UserName, passwd = password, ssl = TRUE),
                      authenticate = TRUE,
                      send = TRUE, 
@@ -34,11 +41,11 @@ if(Today %in% c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")) 
     
   }
   
-  if(WARNING.BUY.VTI==TRUE) {
+  if(WARNING.BUY==TRUE) {
     mailR::send.mail(from = "Pirate.Analysis@ARRRRH.com",
                      to = EMAIL,
-                     subject = "BUY NOTIFICATION VTI",
-                     body = "BUY NOTIFICATION VTI",
+                     subject = paste0("BUY NOTIFICATION: ",directory),
+                     body = paste0("BUY NOTIFICATION: ",directory),
                      smtp = list(host.name = "smtp.gmail.com", port = 465, user.name = UserName, passwd = password, ssl = TRUE),
                      authenticate = TRUE,
                      send = TRUE, 
@@ -48,4 +55,4 @@ if(Today %in% c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")) 
   
 }
 #Print the last analysis
-print(tab.email.t)
+  print(tab.email.t)

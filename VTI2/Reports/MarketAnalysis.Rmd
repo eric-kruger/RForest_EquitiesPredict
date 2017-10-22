@@ -26,11 +26,14 @@ computer.name <- Sys.info()["nodename"]
 ```
 
 ```{r include=FALSE,warning=FALSE,message=FALSE}
+
 # Load Trained Model
-  load("~/R/RForest_EquitiesPredict/VTI/MODEL_10.9.17.Rdata")
+  dir <- getwd()
+  dir <- strsplit(dir,"/")[[1]][5]
+  load(paste0("~/R/RForest_EquitiesPredict/",dir,"/MODEL.Rdata"))
 
 # Load Function Library
-  source("~/R/RForest_EquitiesPredict/LIB/RF_FX_lib.R")
+  source(paths$path.lib)
 
 # Model Prediction
   pred <- stock.RF.predict(mod)
@@ -44,8 +47,9 @@ computer.name <- Sys.info()["nodename"]
 
 ```{r}
 # Create Prediction Data Frame (Table)
+  Close.price.model <- paste0(mod$stock2model,".Close.raw")
   prediction <- cbind.data.frame(Date=perf$predict.data$Date,
-                                 Close=perf$predict.data$VTI.Close.raw,
+                                 Close=perf$predict.data[,Close.price.model],
                                  perf$probs,
                                  perf$S.ST.B[,-4],
                                  perf$Performance)
@@ -64,9 +68,9 @@ computer.name <- Sys.info()["nodename"]
   tab.email.t <- paste(tab.email.t,collapse="")
   
   WARNING.SELL.VTI <- FALSE
-  if(prediction$Pred.Action[1]=="SELL") {WARNING.SELL.VTI <- TRUE}
+  if(prediction$Pred.Action[1]=="SELL") {WARNING.SELL <- TRUE}
   WARNING.BUY.VTI <- FALSE
-  if(prediction$Pred.Action[1]=="BUY")  {WARNING.BUY.VTI <- TRUE}
+  if(prediction$Pred.Action[1]=="BUY")  {WARNING.BUY <- TRUE}
 ```
 
 # Model Prediction
@@ -101,7 +105,7 @@ print(round(perf$`Error Rates`,2))
 
 ```{r}
 # Save Predicted Data from Last Run
-write.csv(pred$predict.data,"~/R/RForest_EquitiesPredict/VTI/HistoricalData/VTI_pred_data.csv")
+write.csv(pred$predict.data,paste0(paths$path.history,"/",mod$stock2model,"_pred_history.csv"))
 ```
 
 # Plot of predicted postions based on policy
@@ -146,8 +150,11 @@ write.csv(pred$predict.data,"~/R/RForest_EquitiesPredict/VTI/HistoricalData/VTI_
 # Daily Intraday Trading Report
 
 ```{r}
-VTI.ID <- Intraday("https://finance.google.com/finance/getprices?q=VTI&x=NYSEARCA&i=60&p=1d&f=d,c,h,l,o,v")
-plot(VTI.ID$CLOSE)
-barChart(VTI.ID,theme='white.mono',bar.type='hlc')
+market <- "NYSEARCA"      #This needs to be searched and inputed every time the target stock is changed
+SYMBOL <- mod$stock2model
+google.finance.link   <- paste0("https://finance.google.com/finance/getprices?q=",SYMBOL,"&x=",market,"&i=60&p=1d&f=d,c,h,l,o,v")
+ID  <- Intraday(google.finance.link)
+plot(ID$CLOSE)
+barChart(ID,theme='white.mono',bar.type='hlc')
 ```
 

@@ -1,5 +1,8 @@
+# Directory Setup
+source("~/R/RForest_EquitiesPredict/VTI2/SETUP.R")
+
 # Load Training Data
-  source("~/R/RForest_EquitiesPredict/LIB/RF_FX_lib.R")
+  source(paths$path.lib)
   quantmod::getSymbols(c("VTI","GLD","SH","BND"),src="google",from ="2004-12-15",to = Sys.Date()) 
   stock.data <- list(VTI=VTI,GLD=GLD,SH=SH,BND=BND)
 
@@ -14,7 +17,7 @@
                       trees=1500)
   mod
 # Save Data
-  #save.image("~/R/RForest_EquitiesPredict/VTI/MODEL_10.111.17.Rdata")
+  save(personal,paths,mod,file=paste0(paths$path.dir,"/MODEL.Rdata"))
   
 # Evaluate Variable importance
   impt <- importance(mod$model,type=2)

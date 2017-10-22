@@ -1,4 +1,5 @@
-source("~/R/RForest_EquitiesPredict/LIB/RF_FX_lib.R")
+source("~/R/RForest_EquitiesPredict/VTI2/SETUP.R")
+source(paths$path.lib)
 
 # Load Data
   quantmod::getSymbols(c("VTI","GLD","SH","BND"),src="google",from ="2004-12-15",to = Sys.Date()) 
@@ -6,9 +7,8 @@ source("~/R/RForest_EquitiesPredict/LIB/RF_FX_lib.R")
 
 # Model
   mod <- stock.RF.mod(symbols=stock.data,forecast.days = 20,FROM = "2004-12-15",TO = "2017-08-29",smooth.r=0.14)
-  #load("~/R/RForest_EquitiesPredict/VTI/MODEL_10.9.17.Rdata")
   pred <- stock.RF.predict(mod,newdata=stock.data)
-  perf <- stock.RF.performance(predict.obj=pred,sell.max = -0.01,stay.max = 0.01,buy.max = 99,sell.t=0.85,buy.t=0.5)
+  perf <- stock.RF.performance(predict.obj=pred,sell.max = -0.01,stay.max = 0.01,buy.max = 99,sell.t=0.6,buy.t=0.6)
   pol <- policy.test(perf)
 
 # Simulate Number of Variables to Try at each step
@@ -64,16 +64,15 @@ for(i in 1:nrow(sim)) {
   EV[i]             <- p2$End.Value
 }
 
-sim$Cycle.Error <- cycle.Error
-sim$cycle.a <- cycle.aggregate
-sim$End.Value <- EV
-sim$T.ACTION.ERROR <- unlist(sim.out)
-min(sim$T.ACTION.ERROR)
+# Policy Output
+  sim$Cycle.Error <- cycle.Error
+  sim$cycle.a <- cycle.aggregate
+  sim$End.Value <- EV
+  sim$T.ACTION.ERROR <- unlist(sim.out)
+  min(sim$T.ACTION.ERROR)
+  sim <- arrange(sim,desc(cycle.a))
+  sim
 
-sim <- arrange(sim,desc(cycle.a))
-sim
 
-p.final <- stock.RF.performance(predict.obj=pred,sell.max = -0.01,stay.max = 0.01,buy.max = 99,sell.t=0.86,buy.t=0.4)
-p.final
 
 
