@@ -39,7 +39,7 @@ computer.name <- Sys.info()["nodename"]
   pred <- stock.RF.predict(mod)
 
 # Model Performance
-  perf <- stock.RF.performance(predict.obj=pred,sell.max = -0.01,stay.max = 0.01,buy.max = 99,sell.t=0.6,buy.t=0.6)
+  perf <- stock.RF.performance(predict.obj=pred,sell.max = -0.01,stay.max = 0.01,buy.max = 99,sell.t=0.84,buy.t=0.4)
 
 # Model Policy
   pol <- policy.test(perf)
