@@ -1,0 +1,137 @@
+---
+title: "VEU Analysis"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    css: Report.css
+---
+
+```{r knitr_init, echo=FALSE, cache=FALSE,warning=FALSE,message=FALSE}
+library(knitr)
+library(rmdformats)
+library(kableExtra)
+## Global options
+opts_chunk$set(echo=FALSE,
+	             cache=FALSE,
+               prompt=FALSE,
+               tidy=TRUE,
+               comment=NA,
+               message=FALSE,
+               warning=FALSE)
+opts_knit$set(width=1500)
+options(knitr.table.format = "html") 
+options(max.print=999999999)
+temp <-tempdir()
+computer.name <- Sys.info()["nodename"]
+```
+
+```{r include=FALSE,warning=FALSE,message=FALSE}
+
+# Load Trained Model
+  dir <- getwd()
+  dir <- strsplit(dir,"/")[[1]][5]
+  load(paste0("~/R/RForest_EquitiesPredict/",dir,"/MODEL.Rdata"))
+
+# Load Function Library
+  source(paths$path.lib)
+
+# Model Prediction
+  pred <- stock.RF.predict(mod)
+
+# Model Performance
+  perf <- stock.RF.performance(predict.obj=pred,sell.max = -0.01,stay.max = 0.01,buy.max = 99,sell.t=0.84,buy.t=0.4)
+
+# Model Policy
+  pol <- policy.test(perf)
+```
+
+```{r}
+# Create Prediction Data Frame (Table)
+  Close.price.model <- paste0(mod$stock2model,".Close.raw")
+  prediction <- cbind.data.frame(Date=perf$predict.data$Date,
+                                 Close=perf$predict.data[,Close.price.model],
+                                 perf$probs,
+                                 perf$S.ST.B[,-4],
+                                 perf$Performance)
+  prediction <- arrange(prediction,desc(Date))
+  prediction[,3:14] <- round(prediction[,3:14],3)
+
+#Create email cues and summary
+  tab <- prediction[1,c("Date","Close","SELL","STAY","BUY","Pred.Action")]
+  tab[,3:5]  <- round(tab[,3:5],3)
+  tab        <- t(tab)
+  tab2       <- cbind(rownames(tab),tab)
+  tab3       <- apply(tab2,1,paste,collapse=" : ")
+  names(tab3) <- NULL
+  tab3 <- t(t(tab3))
+  tab.email.t <- paste0(tab3,"\n")
+  tab.email.t <- paste(tab.email.t,collapse="")
+  
+  WARNING.SELL <- FALSE
+  if(prediction$Pred.Action[1]=="SELL") {WARNING.SELL <- TRUE}
+  WARNING.BUY <- FALSE
+  if(prediction$Pred.Action[1]=="BUY")  {WARNING.BUY <- TRUE}
+```
+
+# Model Prediction
+
+```{r}
+kable(cbind(Daysback=0:-39,prediction[1:40,]),bootstrap=T) %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+# Prediction Error
+
+```{r}
+options(width = 10000)
+print(perf$Prediction.Error.matrix)
+```
+
+# Actual Direction Error
+
+```{r}
+print(perf$Actual.Direction.Error.matrix)
+```
+
+# Action Error
+
+```{r}
+print(perf$Action.Error.matrix)
+```
+# Error Rates Summary
+
+```{r}
+print(round(perf$`Error Rates`,2))
+```
+
+```{r}
+# Save Predicted Data from Last Run
+write.csv(pred$predict.data,paste0(paths$path.history,"/",mod$stock2model,"_pred_history.csv"))
+```
+
+# Plot of predicted postions based on policy
+
+```{r}
+# 40 days back
+  position.plot(pol$policy.predict,days.back.window = 40)
+
+# 6 mo back
+  position.plot(pol$policy.predict,days.back.window = 150)
+
+# One Year Back
+  position.plot(pol$policy.predict,days.back.window = 365)
+
+# All data
+  position.plot(pol$policy.predict,days.back.window = "ALL")
+```
+
+# Daily Intraday Trading Report
+
+```{r}
+market <- "NYSEARCA"      #This needs to be searched and inputed every time the target stock is changed
+SYMBOL <- mod$stock2model
+google.finance.link   <- paste0("https://finance.google.com/finance/getprices?q=",SYMBOL,"&x=",market,"&i=60&p=1d&f=d,c,h,l,o,v")
+ID  <- Intraday(google.finance.link)
+plot(ID$CLOSE)
+barChart(ID,theme='white.mono',bar.type='hlc')
+```
+

@@ -1,4 +1,4 @@
-source("~/R/RForest_EquitiesPredict/GOOGL/SETUP.R")
+source("~/R/RForest_EquitiesPredict/GE/SETUP.R")
 source(paths$path.lib)
 library(rmarkdown)
 
