@@ -32,6 +32,9 @@ computer.name <- Sys.info()["nodename"]
   dir <- strsplit(dir,"/")[[1]][5]
   load(paste0("~/R/RForest_EquitiesPredict/",dir,"/MODEL.Rdata"))
 
+# Load Data file
+  load(paste0(paths$path.dir,"/DAT.Rdata"))
+  
 # Load Function Library
   source(paths$path.lib)
 
@@ -39,7 +42,7 @@ computer.name <- Sys.info()["nodename"]
   pred <- stock.RF.predict(mod)
 
 # Model Performance
-  perf <- stock.RF.performance(predict.obj=pred,sell.max = -0.01,stay.max = 0.01,buy.max = 99,sell.t=0.6,buy.t=0.6)
+  perf <- stock.RF.performance(predict.obj=pred,sell.max = -0.01,stay.max = 0.01,buy.max = 99,sell.t=0.8,buy.t=0.75)
 
 # Model Policy
   pol <- policy.test(perf)
@@ -79,6 +82,12 @@ computer.name <- Sys.info()["nodename"]
 kable(cbind(Daysback=0:-39,prediction[1:40,]),bootstrap=T) %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
 ```
 
+# Model Cycle Metrics
+
+```{r}
+kable(pol$Cycle.metrics,bootstrap=T) %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
 # Prediction Error
 
 ```{r}
@@ -102,6 +111,13 @@ print(perf$Action.Error.matrix)
 ```{r}
 print(round(perf$`Error Rates`,2))
 ```
+
+# Cycle Error
+
+```{r}
+print(round(pol$Cycle.Error),2)
+```
+
 
 ```{r}
 # Save Predicted Data from Last Run
@@ -127,7 +143,7 @@ write.csv(pred$predict.data,paste0(paths$path.history,"/",mod$stock2model,"_pred
 # Daily Intraday Trading Report
 
 ```{r}
-market <- "NYSE"      #This needs to be searched and inputed every time the target stock is changed
+market <- dat$Market      
 SYMBOL <- mod$stock2model
 google.finance.link   <- paste0("https://finance.google.com/finance/getprices?q=",SYMBOL,"&x=",market,"&i=60&p=1d&f=d,c,h,l,o,v")
 ID  <- Intraday(google.finance.link)

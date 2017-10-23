@@ -1,93 +1,59 @@
-source("~/R/RForest_EquitiesPredict/GE/SETUP.R")
+source("~/R/RForest_EquitiesPredict/GE/SETUP.R") # e.g. source("~/R/RForest_EquitiesPredict/VEU/SETUP.R") 
+load(paste0(paths$path.dir,"/DAT.Rdata"))
 source(paths$path.lib)
 
 # Load Data
-quantmod::getSymbols(c("GE"),src="google",from ="2004-12-15",to = Sys.Date()) 
-stock.data <- list(GE=GE)
-
+  quantmod::getSymbols(dat[["symbols"]],src="google",from = dat[["FROM"]],to = dat[["TO.predict"]]) 
+    stock.data <- list()
+    for(stock.name in symbols) {
+      stock.data[[stock.name]] <- eval(parse(text=stock.name))
+    }
+  
 # Model
-mod <- stock.RF.mod(stock2model = "GE",
-                    symbols=stock.data,
-                    forecast.days = 20,
-                    FROM = "2004-12-15",
-                    TO = "2017-08-29",
-                    smooth.r=0.14, 
-                    mtry=10,
-                    trees=1500)
-pred <- stock.RF.predict(mod,newdata=stock.data)
+  mod <- stock.RF.mod(stock2model = dat$stock2model,
+                      symbols=stock.data,
+                      forecast.days = 20,
+                      FROM = dat$FROM,
+                      TO = dat$TO.model,
+                      smooth.r=0.14, 
+                      mtry=10,
+                      trees=1500)
+  pred <- stock.RF.predict(mod,newdata=stock.data)
 
 # Simulate Number of Variables to Try at each step
-rs <- 1:20
-ER <- NULL
-for(i in 1:length(rs)) {
-  mod <- stock.RF.mod(symbols=stock.data,forecast.days = 20,FROM = "2004-12-15",TO = "2017-08-29",smooth.r=0.14,mtry=rs[i]) 
-  ER[i] <- pred.error(mod$model$confusion)
-}
-mtry <- cbind.data.frame(rs, ER)
-mtry
+  sim.mtry(stock2model = dat$stock2model,                     
+           symbols=stock.data,
+           forecast.days = 20,
+           FROM = dat$FROM,
+           TO = dat$TO.model,
+           smooth.r=0.14, 
+           mtry=10,
+           trees=1500,
+           SEQ = 1:3)               # Edit this line 
 
 # Simulate Smoothing 
-sim.s <- seq(0.1,1,by=0.02)
-errors <- NULL
-ce     <- NULL
-EV     <- NULL
-for (i in 1:length(sim.s)) {
-  mod <-   mod <- stock.RF.mod(stock2model = "GE",                     # Need to fix this model 
-                               symbols=stock.data,
-                               forecast.days = 20,
-                               FROM = "2001-12-15",
-                               TO = "2017-08-29",
-                               smooth.r=sim.s[i], 
-                               mtry=10,
-                               trees=1500)
-  pred <- stock.RF.predict(mod,newdata=stock.data)
-  perf <- stock.RF.performance(predict.obj=pred,sell.max = -0.01,stay.max = 0.01,buy.max = 99,sell.t=0.85,buy.t=0.5)
-  pol <- policy.test(perf)
-  errors <- rbind.data.frame(errors,perf$`Error Rates`)
-  ce[[i]] <- pol$Cycle.Error
-  EV[[i]] <- pol$End.Value
-  rm(mod,pred,perf,pol)
-}
-sim.sum <- cbind.data.frame(Smoothing=sim.s,errors,Cycle.Error=ce,End.Value=EV)
-sim.sum
-
+  sim.smooth(stock2model = dat$stock2model,                     
+             symbols=stock.data,
+             forecast.days = 20,
+             FROM = dat$FROM,
+             TO = dat$TO.model,
+             mtry=10,
+             trees=1500,
+             sell.max=-0.01,
+             stay.max=0.01,
+             buy.max=99,
+             sell.t=0.6,
+             buy.t=0.6,
+             BY=0.2)               # Edit this line
 
 # Simulation Policy
-sim <- expand.grid(sell=seq(0,1,by=0.02),buy=seq(0,1,by=0.02)) #buys and sell probabilities
-sim.out      <- NULL
-cycle.Error  <- NULL
-cycle.aggregate <- NULL
-EV <- NULL
-i <- 1
-for(i in 1:nrow(sim)) {
-  # performance
-  p <- stock.RF.performance(predict.obj=pred,
-                            sell.max = -0.01,
-                            stay.max = 0.01,
-                            buy.max = 99,
-                            sell.t=sim$sell[i],
-                            buy.t=sim$buy[i])
-  # Policy
-  p2 <- policy.test(p)
-  
-  sim.out[i] <- p$`Error Rates`[7]
-  cycle.Error[i] <- p2$Cycle.Error
-  a <- ifelse(p2$Cycle.metrics$Position=="CASH",p2$Cycle.metrics$change*-1,p2$Cycle.metrics$change*1)
-  cycle.aggregate[i] <-sum(a)
-  EV[i]             <- p2$End.Value
-}
-
-# Policy Output
-sim$Cycle.Error <- cycle.Error
-sim$cycle.a <- cycle.aggregate
-sim$End.Value <- EV
-sim$T.ACTION.ERROR <- unlist(sim.out)
-min(sim$T.ACTION.ERROR)
-sim <- arrange(sim,desc(cycle.a))
-sim
-
+  sim.policy(pred,
+             BY=0.05,
+             sell.max=-0.01,
+             stay.max=0.01,
+             buy.max=99)
 
 #-----------------------------------------------------------------------------------------------------------------------#
 # Examine the results of specific types
-perf <- stock.RF.performance(predict.obj=pred,sell.max = -0.01,stay.max = 0.01,buy.max = 99,sell.t=0.99,buy.t=0.99)
-pol  <- policy.test(perf)
+  perf <- stock.RF.performance(predict.obj=pred,sell.max = -0.01,stay.max = 0.01,buy.max = 99,sell.t=0.6,buy.t=0.6)
+  pol  <- policy.test(perf)

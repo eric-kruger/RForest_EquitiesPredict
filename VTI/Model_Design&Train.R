@@ -1,17 +1,36 @@
 # Directory Setup
-source("~/R/RForest_EquitiesPredict/VTI/SETUP.R")
-
+  source("~/R/RForest_EquitiesPredict/VTI/SETUP.R") # e.g. source("~/R/RForest_EquitiesPredict/VEU/SETUP.R")         
+  FROM             <- "2004-12-15"
+  TO.model         <- "2017-08-29"
+  TO.predict       <- Sys.Date()
+  stock2model      <- "VTI"              # e.g. "VEU"
+  symbols          <- c("VTI","SH","BND","GLD")                    # e.g. c("VEU")
+  Market           <- "NYSEARCA"   # e.g. "NYSEARCA"
+  
 # Load Training Data
   source(paths$path.lib)
-  quantmod::getSymbols(c("VTI","GLD","SH","BND"),src="google",from ="2004-12-15",to = Sys.Date()) 
-  stock.data <- list(VTI=VTI,GLD=GLD,SH=SH,BND=BND)
-
+  quantmod::getSymbols(symbols,src="google",from = FROM,to = TO.predict) 
+  stock.data <- list()
+  for(stock.name in symbols) {
+    stock.data[[stock.name]] <- eval(parse(text=stock.name))
+  }
+ 
+  dat <- list(stock2model=stock2model,
+              FROM=FROM,
+              TO.model=TO.model,
+              TO.predict=TO.predict,
+              symbols=symbols,
+              stock.data=stock.data,
+              Market=Market)
+  
+  save(dat,file=paste0(paths$path.dir,"/DAT.Rdata"))
+  
 # Train the Model
-  mod <- stock.RF.mod(stock2model = "VTI",
+  mod <- stock.RF.mod(stock2model = stock2model,
                       symbols=stock.data,
                       forecast.days = 20,
-                      FROM = "2004-12-15",
-                      TO = "2017-08-29",
+                      FROM = FROM,
+                      TO = TO.model,
                       smooth.r=0.14, 
                       mtry=10,
                       trees=1500)
@@ -30,9 +49,10 @@ source("~/R/RForest_EquitiesPredict/VTI/SETUP.R")
 # Prediction (Predict the data)
   pred <- stock.RF.predict(mod,newdata=stock.data)
   pred
+  
 
 # Performance (Evaluate performance of prediction)
-  perf <- stock.RF.performance(predict.obj=pred,sell.max = -0.01,stay.max = 0.01,buy.max = 99,sell.t=0.6,buy.t=0.6)
+  perf <- stock.RF.performance(predict.obj=pred,sell.max = -0.01,stay.max = 0.01,buy.max = 99,sell.t=0.84,buy.t=0.4)
   perf
 
 # Policy (Evaluate performance of model based on a specific investment policy)

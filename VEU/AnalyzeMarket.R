@@ -1,10 +1,10 @@
-source("~/R/RForest_EquitiesPredict/VEU/SETUP.R")
+source("~/R/RForest_EquitiesPredict/VEU/SETUP.R") # e.g. source("~/R/RForest_EquitiesPredict/VEU/SETUP.R") 
 source(paths$path.lib)
 library(rmarkdown)
 
 Today <- weekdays(Sys.Date())
 
-if(Today %in% c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")) {
+if(Today %in% c("Monday","Tuesday","Wednesday","Thursday","Friday")) {
   
   rmarkdown::render(paste0(paths$path.report,"/MarketAnalysis.Rmd"))
   

@@ -688,3 +688,109 @@ Intraday <- function(URL) {
   return(a)
 }
 
+#---------------------------------------------------------------------------------------------------------------------#
+# Function for optimizing a model based on policy results
+
+sim.policy <- function(pred.obj,
+                       BY=0.2,
+                       sell.max=-0.01,
+                       stay.max=0.01,
+                       buy.max=99) {
+  
+  sim <- expand.grid(sell=seq(0,1,by=BY),buy=seq(0,1,by=BY)) #buys and sell probabilities
+  sim.out      <- NULL
+  cycle.Error  <- NULL
+  cycle.aggregate <- NULL
+  EV <- NULL
+  i <- 1
+  for(i in 1:nrow(sim)) {
+    # performance
+    p <- stock.RF.performance(predict.obj=pred.obj,
+                              sell.max = sell.max,
+                              stay.max = stay.max,
+                              buy.max = buy.max,
+                              sell.t=sim$sell[i],
+                              buy.t=sim$buy[i])
+    # Policy
+    p2 <- policy.test(p)
+    
+    sim.out[i] <- p$`Error Rates`[7]
+    cycle.Error[i] <- p2$Cycle.Error
+    a <- ifelse(p2$Cycle.metrics$Position=="CASH",p2$Cycle.metrics$change*-1,p2$Cycle.metrics$change*1)
+    cycle.aggregate[i] <-sum(a,na.rm=TRUE)
+    EV[i]             <- p2$End.Value
+  }
+  
+  # Policy Output
+  sim$Cycle.Error <- cycle.Error
+  sim$cycle.a <- cycle.aggregate
+  sim$End.Value <- EV
+  sim$T.ACTION.ERROR <- unlist(sim.out)
+  min(sim$T.ACTION.ERROR)
+  sim <- arrange(sim,desc(cycle.a))
+  return(sim)
+}
+
+#---------------------------------------------------------------------------------------------------------------------#
+# Function for optimizing a model based on smoothing value of EMA
+
+sim.smooth <- function(stock2model = "VEU",                     
+                       symbols=stock.data,
+                       forecast.days = 20,
+                       FROM = "2007-03-01",
+                       TO = "2017-08-29",
+                       mtry=10,
+                       trees=1500,
+                       BY=0.02,
+                       sell.max=-0.01,
+                       stay.max=0.01,
+                       buy.max=99,
+                       sell.t=0.6,
+                       buy.t=0.6) {
+  
+  sim.s <- seq(0.1,1,by=BY)
+  errors <- NULL
+  ce     <- NULL
+  EV     <- NULL
+  for (i in 1:length(sim.s)) {
+    mod <-   mod <- stock.RF.mod(stock2model = stock2model,                      
+                                 symbols=stock.data,
+                                 forecast.days = forecast.days,
+                                 FROM = FROM,
+                                 TO = TO,
+                                 smooth.r=sim.s[i], 
+                                 mtry=mtry,
+                                 trees=trees)
+    pred <- stock.RF.predict(mod,newdata=stock.data)
+    perf <- stock.RF.performance(predict.obj=pred,sell.max = sell.max,stay.max = stay.max,buy.max = buy.max,sell.t=sell.t,buy.t=buy.t)
+    pol <- policy.test(perf)
+    errors <- rbind.data.frame(errors,perf$`Error Rates`)
+    ce[[i]] <- pol$Cycle.Error
+    EV[[i]] <- pol$End.Value
+    rm(mod,pred,perf,pol)
+  }
+  sim.sum <- cbind.data.frame(Smoothing=sim.s,errors,Cycle.Error=ce,End.Value=EV)
+  return(sim.sum)
+}
+
+#---------------------------------------------------------------------------------------------------------------------#
+# Function for optimizing a model based on number of variables to try at each branch
+
+sim.mtry <- function(stock2model = "VEU",                     
+                     symbols=stock.data,
+                     forecast.days = 20,
+                     FROM = "2007-03-01",
+                     TO = "2017-08-29",
+                     smooth.r=0.14, 
+                     mtry=10,
+                     trees=1500,
+                     SEQ)  {
+  rs <- SEQ
+  ER <- NULL
+  for(i in 1:length(rs)) {
+    mod <- stock.RF.mod(stock2model=stock2model, symbols=stock.data,forecast.days = 20,FROM = "2004-12-15",TO = "2017-08-29",smooth.r=0.14,mtry=rs[i]) 
+    ER[i] <- pred.error(mod$model$confusion)
+  }
+  mtry <- cbind.data.frame(rs, ER)
+  return(mtry)
+}
