@@ -304,9 +304,10 @@ stock.RF.mod <- function(stock2model = "VTI",                                   
 #---------------------------------------------------------------------------------------------------------------------#
 # This function uses new data to predict future categories of market direction
 
-stock.RF.predict <- function(model.object,                  # Model Object
-                             newdata=NULL,                  # If not downloading data in function needs to be specified
-                             end.date=Sys.Date(),...) {     # Specify end predict date defaults to todays date
+stock.RF.predict <- function(model.object,
+                             newdata=NULL,
+                             end.date=Sys.Date(),
+                             ...) {     
   
   # Based on model object specified in the previous data 
     stock2predict = model.object[["stock2model"]]
@@ -347,12 +348,12 @@ stock.RF.predict <- function(model.object,                  # Model Object
 #---------------------------------------------------------------------------------------------------------------------#
 # This function deterimnes model performance on trained data and predicted data
 
-stock.RF.performance <- function(predict.obj,     # Prediction object
-                                 sell.max,        # Max Sell Value
-                                 stay.max,        # Max Stay Value
-                                 buy.max=99,      # Max Buy  Value
-                                 sell.t=0.85,     # Threshold prob to sell
-                                 buy.t=0.85) {    # Threshold prob to buy
+stock.RF.performance <- function(predict.obj,
+                                 sell.max,
+                                 stay.max,
+                                 buy.max=99,
+                                 sell.t=0.85,
+                                 buy.t=0.85) {    
   
   # Function Debugging 
     # predict.obj   <- pred
@@ -494,9 +495,9 @@ policy.test <- function(performance.obj,        # Performance object specified a
                         Shares.start=0,         # How many shares to start with
                         trade.cost=6.95) {      # Trad cost
  # Function Debugging
-   performance.obj           <- perf
-   Bank   <- Bank.start      <- 10000
-   shares <- Shares.start    <- 0
+   # performance.obj           <- perf
+   # Bank   <- Bank.start      <- 10000
+   # shares <- Shares.start    <- 0
   
   Bank   <- Bank.start      
   shares <- Shares.start   
@@ -523,6 +524,7 @@ policy.test <- function(performance.obj,        # Performance object specified a
   
   for (i in 1:nrow(df)) {
     can.buy <- as.integer((Bank-trade.cost)/df$Mean.price[i])
+    if(can.buy<0) {can.buy <- 0}
     if(can.buy > 0 & shares > 0 ) {
       if(df$ACTION[i]=="BUY") {
         Bank <- Bank-can.buy*df$Mean.price[i]-trade.cost
