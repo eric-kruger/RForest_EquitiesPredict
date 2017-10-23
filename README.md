@@ -1,7 +1,7 @@
 # RForest_EquitiesPredict
-Random Forest Classification Equities Prediction Algorithm
+RF Equities Classifier
 ------
-This a random forest classification prediction algorithm which is designed to predict a stocks future increase in price (based on % of price increase in the future). This model approaches the future market as a classification problem. Rather than try to predict an exact stock price it predicts a category of percent change. The default is to make this prediction 20 days out.
+This a RF classification algorithm which is designed to predict a stocks future increase in price (based on % of price increase in the future). This model approaches the future market as a classification problem. Rather than try to predict an exact stock price it predicts a category of percent change. The default is to make this prediction 20 days out.
 
 There are several examples of implementation in the folder. Each prediction algroithim gets its own folder. There is a template folder for making new files. The core functionality is in the 'Model_Design&Train.R' file and the '/Reports/MarketAnalysis.Rmd' Here is an overview of what each fild does in the folder.  
 
