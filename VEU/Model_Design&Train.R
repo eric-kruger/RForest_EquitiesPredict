@@ -3,7 +3,7 @@ source("~/R/RForest_EquitiesPredict/VEU/SETUP.R")
 
 # Load Training Data
   source(paths$path.lib)
-  quantmod::getSymbols(c("VEU"),src="google",from ="1995-12-15",to = Sys.Date()) 
+  quantmod::getSymbols(c("VEU"),src="google",from ="2004-12-15",to = Sys.Date()) 
   stock.data <- list(VEU=VEU)
 
 # Train the Model

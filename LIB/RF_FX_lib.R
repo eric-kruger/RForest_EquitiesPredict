@@ -667,6 +667,7 @@ position.plot <- function(p.df,days.back.window=40) {
 
 Intraday <- function(URL) {
   #URL <- "https://finance.google.com/finance/getprices?q=VTI&x=NYSEARCA&i=60&p=1d&f=d,c,h,l,o,v"
+  #URL <- paste0("https://finance.google.com/finance/getprices?q=",SYMBOL,"&x=",market,"&i=60&p=1d&f=d,c,h,l,o,v")
   ID <- readLines(URL)
   ls <- list()
   ls[["INTERVAL"]]         <- as.numeric(strsplit(ID[4],"=")[[1]][2])
