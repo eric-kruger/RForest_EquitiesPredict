@@ -32,13 +32,15 @@ The example discussed below predicts VTI ([Vanguard Total Stock Market Index Fun
 
 + Files in Model subdirectory e.g. 'VTI'
 	+ 'AnalyzeMarket.R': This is responsible for generating emails and BUY and SELL notifications via email. It does so by using the 'mailR' package (_Note:_ you must have JAVA installed to use). Also you must install pandoc into your R environment in order to do this. This file is accessed by the batch files. Also to use 'mailR' with gmail you must set up an app specific password. I am obviously not showing you this and this is information is stored in a file called MAILR.personal within the main folder.
-	+ 'Model_Design&Train.R': setup model, train model, also sets up key configurations that are carried forward to other files in the directory.
+	+ __'Model_Design&Train.R'__: setup model, train model, also sets up key configurations that are carried forward to other files in the directory.
 	+ 'Model_Optimization&Backtesting.R': this file is used for testing, optimizing and backtesting a model with various configurations of decision rules for implementing a policy.
 	+ 'MODEL.Rdata': Where the model is stored
 	+ 'DAT.Rdata': Where some of the variables set up in 'Model_Design&Train.R' are saved and accessed from other scripts.
 	+  SETUP.R: When this script is run it defines various paths and other variables necessary for the model to be implemented across a variety of scripts.
-	+ '/Reports/MarketAnalysis.Rmd': Builds the report based on the days prediction from the model. The report contains various information including prediction, historical predictions, plots of position (based on trading policy), intraday trade plots, cycle metrics (which is the position and the swing that occured while in that position, the goal is to be in stocks and change = + and be in cash when change = -)
+	+ __'/Reports/MarketAnalysis.Rmd'__: Builds the report based on the days prediction from the model. The report contains various information including prediction, historical predictions, plots of position (based on trading policy), intraday trade plots, cycle metrics (which is the position and the swing that occured while in that position, the goal is to be in stocks and change = + and be in cash when change = -)
 	+ 'VTI_pred_history.csv': A .csv with output of all the data used in the predicition including RAW OHLCV data
+
+Core functionality is in the __Bolded__ files above. Makes sure that you adjust the file paths in the header for each file. These will be different for your computer. 
 
 There are a number of functions that are highly customizable in the /LIB folder. The main functions are 
 + stocks.pre.process()
