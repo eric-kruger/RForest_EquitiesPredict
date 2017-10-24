@@ -45,8 +45,11 @@ computer.name <- Sys.info()["nodename"]
   perf <- stock.RF.performance(predict.obj=pred,sell.max = -0.01,stay.max = 0.01,buy.max = 99,sell.t=0.6,buy.t=0.85)
 
 # Model Policy
-  pol <- policy.test(perf)
+  pol <- policy.test(perf) 
 ```
+
+Sell Threshold: `r perf$sell.prob.threshold`
+Buy  Threshold: `r perf$buy.prob.threshold`
 
 ```{r}
 # Create Prediction Data Frame (Table)

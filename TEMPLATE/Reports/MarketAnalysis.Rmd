@@ -48,6 +48,9 @@ computer.name <- Sys.info()["nodename"]
   pol <- policy.test(perf)
 ```
 
+Sell Threshold: `r perf$sell.prob.threshold`
+Buy  Threshold: `r perf$buy.prob.threshold`
+
 ```{r}
 # Create Prediction Data Frame (Table)
   Close.price.model <- paste0(mod$stock2model,".Close.raw")
