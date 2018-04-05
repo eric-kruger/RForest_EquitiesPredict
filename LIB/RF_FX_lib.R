@@ -4,6 +4,13 @@ library(scales)
 library(quantmod)
 library(randomForest)
 library(tidyverse)
+library(reticulate)
+library(magrittr)
+library(lubridate)
+#---------------------------------------------------------------------------------------------------------------------#
+# Set Up Python Retitculate
+use_virtualenv("~/myenv")
+source_python('~/R/RForest_EquitiesPredict/LIB/RF_Python_Fx_Lib.py')
 
 #---------------------------------------------------------------------------------------------------------------------#
 # Error Prediction Functions
@@ -81,13 +88,19 @@ STC <- function(x,EMA.long=50,EMA.short=23,n.stoch=10) {
 stocks.pre.process <- function(symbols,        # Stocks to download or a list of predownloaded stocks 
                                FROM,           # start date (will subset if data is larger)
                                TO,             # end date (will subset)
-                               smooth.r) {     # smoothing ratio for expoential moving average
+                               smooth.r,quantmod=FALSE) {     # smoothing ratio for expoential moving average
   # Function Debugging
-    # symbols <- stock.data
-    # TO <- "2017-08-29"
-    # smooth.r <- 0.4
-    # stock <- "GLD"
-    # 
+     # symbols <- c("VTI","VXX")
+     # TO <- "2017-08-29"
+     # FROM <- "2001-01-01"
+     # smooth.r <- 0.4
+     # stock <- "VTI"
+     # quantmod <- FALSE
+    #####################
+     reticulate::use_virtualenv("~/myenv")
+     reticulate::source_python('~/R/RForest_EquitiesPredict/LIB/RF_Python_Fx_Lib.py')
+     
+  if(quantmod==TRUE) {
   if(is.list(symbols)==TRUE) {
     for (stock in names(symbols)) {
       symbols[[stock]] <- symbols[[stock]][which(index(symbols[[stock]])<=as.Date(TO)),]
@@ -95,22 +108,44 @@ stocks.pre.process <- function(symbols,        # Stocks to download or a list of
     }
     symbols <- names(symbols)
   } else {
-    getSymbols(symbols,src="google",from = FROM,to = TO) # Don't use yahoo
+    getSymbols(symbols,src="yahoo",from = FROM,to = TO) # Don't use yahoo
     # Note for analysis predictions to be correct you must have start the prediction dataset must include all the data used
     # in the training dataset this is because all of the technical indicators are retrospective and thus you need to make
     # sure that they have the same starting point or their values will be too different from the fitted model and you will
     # get less accurate predictions
     # In this model prediciton begins at 8-1-17 because 20 days are removed from the forecast
   }
+  }
+     
+   if(quantmod==FALSE) {
+     if(is.list(symbols)==TRUE) {
+       for (stock in names(symbols)) {
+         symbols[[stock]] <- symbols[[stock]][which(index(symbols[[stock]])<=as.Date(TO)),]
+         assign(stock,symbols[[stock]])
+       }
+       symbols <- names(symbols)
+     } else {
+      # Enter Tiingo Code Here
+       for (stock in symbols) {
+       df.stock <- read.csv(text=sp(stock,FROM,as.character(TO),'daily'),stringsAsFactors = FALSE)
+       df.stock %<>% select(date,open,high,low,close,volume)
+       df.stock$date %<>% as.Date()
+       assign(stock, df.stock)
+       }
+       ######################### 
+     }
+   }
+     
   stocks <- list()
   for (stock in symbols) {
     s.name <- stock
     
     # Rename Variables to remove specific stock names and create a stock specific dataframe
       df <- as.data.frame(eval(parse(text=stock)))
-      df <- cbind.data.frame(Date=rownames(df),df)
+      #df <- cbind.data.frame(Date=rownames(df),df)
       colnames(df) <- c("Date","Open.raw","High.raw","Low.raw","Close.raw","Volume.raw")
-      df$Date <- as.Date(as.character(df$Date))
+      #df$Date <- as.Date(as.character(df$Date))
+      rownames(df) <- df$Date
       df <- na.exclude(df) # some daily data has NAs so this must be removed
     
     # Smoothing
@@ -269,7 +304,7 @@ stock.RF.mod <- function(stock2model = "VTI",                                   
     xtabs(~stocks.df$Direction)
   
   # Add Julian day of year variable 
-    stocks.df$yday <- lubridate::yday(stocks.df$Date)
+    #stocks.df$yday <- lubridate::yday(stocks.df$Date)
   
   # Trim data to just predicted variables for model
     stocks.mod <- select(stocks.df,
@@ -308,6 +343,9 @@ stock.RF.predict <- function(model.object,
                              newdata=NULL,
                              end.date=Sys.Date(),
                              ...) {     
+  model.object <- mod
+  end.date=Sys.Date()
+  
   
   # Based on model object specified in the previous data 
     stock2predict = model.object[["stock2model"]]

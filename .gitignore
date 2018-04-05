@@ -34,3 +34,6 @@ vignettes/*.pdf
 
 # personal info
 *.personal
+
+# Large Files
+WIKI_PRICES.csv

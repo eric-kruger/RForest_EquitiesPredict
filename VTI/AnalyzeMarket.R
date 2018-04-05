@@ -4,7 +4,7 @@ library(rmarkdown)
 
 Today <- weekdays(Sys.Date())
 
-if(Today %in% c("Monday","Tuesday","Wednesday","Thursday","Friday")) {
+if(Today %in% c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")) {
   
   rmarkdown::render(paste0(paths$path.report,"/MarketAnalysis.Rmd"))
   

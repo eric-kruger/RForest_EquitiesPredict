@@ -1,6 +1,6 @@
 # Directory Setup
   source("~/R/RForest_EquitiesPredict/VTI/SETUP.R") # e.g. source("~/R/RForest_EquitiesPredict/VEU/SETUP.R")         
-  FROM             <- "2004-12-15"
+  FROM             <- "2001-12-15"
   TO.model         <- "2017-08-29"
   TO.predict       <- Sys.Date()
   stock2model      <- "VTI"              # e.g. "VEU"
@@ -9,7 +9,7 @@
   
 # Load Training Data
   source(paths$path.lib)
-  quantmod::getSymbols(symbols,src="google",from = FROM,to = TO.predict) 
+  quantmod::getSymbols(symbols,src="yahoo",from = FROM,to = TO.predict) 
   stock.data <- list()
   for(stock.name in symbols) {
     stock.data[[stock.name]] <- eval(parse(text=stock.name))
@@ -58,6 +58,6 @@
 # Policy (Evaluate performance of model based on a specific investment policy)
   pol <- policy.test(perf)
   pol
-
+  pol$Cycle.metrics
  
 
