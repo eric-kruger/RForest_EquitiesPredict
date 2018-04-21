@@ -3,18 +3,19 @@ source(paths$path.lib)
 library(rmarkdown)
 library(git2r)
 
-
 Today <- weekdays(Sys.Date())
 
 if(Today %in% c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")) {
   
-  # Push update to github page
-  N  <- as.character(now())
-  repo <- repository("D:/Documents/R/RForest_EquitiesPredict/")
-  config(repo, user.name="eric-kruger", user.email="esk@unm.edu")
-  add(repo,".")
-  commit(repo,N)
-  system("git push")
+  rmarkdown::render(paste0(paths$path.report,"/MarketAnalysis.Rmd"))
+  
+  # Automatically Push to Git Hub Pages
+    N  <- as.character(now())
+    repo <- repository("D:/Documents/R/RForest_EquitiesPredict/")
+    config(repo, user.name="eric-kruger", user.email="esk@unm.edu")
+    add(repo,".")
+    commit(repo,N)
+    system("git push")
 
   if(is.na(personal)==TRUE) {
     #Google Credentials
