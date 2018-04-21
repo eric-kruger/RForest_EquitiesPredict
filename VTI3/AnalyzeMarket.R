@@ -8,23 +8,14 @@ Today <- weekdays(Sys.Date())
 
 if(Today %in% c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")) {
   
+  # Push update to github page
   N  <- as.character(now())
   repo <- repository("D:/Documents/R/RForest_EquitiesPredict/")
-  summary(repo)
-  workdir(repo)
   config(repo, user.name="eric-kruger", user.email="esk@unm.edu")
   add(repo,".")
   commit(repo,N)
   system("git push")
 
-  Nc <- paste0("git commit -m 'sadads'")
-  print(`git commit -m ["]sdfsfdsdf["]`)
-  rmarkdown::render(paste0(paths$path.report,"/MarketAnalysis.Rmd"))
-  system("git status")
-  system("git add .")
-  system("git config --get user.email")
-  system(Nc)
-  
   if(is.na(personal)==TRUE) {
     #Google Credentials
     EMAIL      <- "{insert full gmail here}"   # Your full email adddress to be sent to
