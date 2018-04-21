@@ -8,16 +8,15 @@ Today <- weekdays(Sys.Date())
 
 if(Today %in% c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")) {
   
-  N  <- now()
+  N  <- as.character(now())
   repo <- repository("D:/Documents/R/RForest_EquitiesPredict/")
   summary(repo)
   workdir(repo)
   config(repo, user.name="eric-kruger", user.email="esk@unm.edu")
   add(repo,".")
-  commits(repo)[[1]]
-  add(repo,)
-  
-  
+  commit(repo,N)
+  system("git push")
+
   Nc <- paste0("git commit -m 'sadads'")
   print(`git commit -m ["]sdfsfdsdf["]`)
   rmarkdown::render(paste0(paths$path.report,"/MarketAnalysis.Rmd"))
