@@ -1,12 +1,30 @@
 source("~/R/RForest_EquitiesPredict/VTI3/SETUP.R") # e.g. source("~/R/RForest_EquitiesPredict/VEU/SETUP.R") 
 source(paths$path.lib)
 library(rmarkdown)
+library(git2r)
+
 
 Today <- weekdays(Sys.Date())
 
 if(Today %in% c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")) {
   
+  N  <- now()
+  repo <- repository("D:/Documents/R/RForest_EquitiesPredict/")
+  summary(repo)
+  workdir(repo)
+  config(repo, user.name="eric-kruger", user.email="esk@unm.edu")
+  add(repo,".")
+  commits(repo)[[1]]
+  add(repo,)
+  
+  
+  Nc <- paste0("git commit -m 'sadads'")
+  print(`git commit -m ["]sdfsfdsdf["]`)
   rmarkdown::render(paste0(paths$path.report,"/MarketAnalysis.Rmd"))
+  system("git status")
+  system("git add .")
+  system("git config --get user.email")
+  system(Nc)
   
   if(is.na(personal)==TRUE) {
     #Google Credentials
