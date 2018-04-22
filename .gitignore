@@ -34,6 +34,7 @@ vignettes/*.pdf
 
 # personal info
 *.personal
+RF_Python_Fx_Lib.py
 
 # Large Files
 WIKI_PRICES.csv
