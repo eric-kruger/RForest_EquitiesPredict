@@ -58,7 +58,7 @@ if(Today %in% c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")) 
   
   # Automatically Push to Git Hub Pages
   N  <- as.character(now())
-  repo <- repository("D:/Documents/R/RForest_EquitiesPredict/")
+  repo <- repository("D:/Documents/R/RForest_EquitiesPredict/",discover=TRUE)
   config(repo, user.name="eric-kruger", user.email="esk@unm.edu")
   add(repo,"*.*")
   commit(repo,N)
