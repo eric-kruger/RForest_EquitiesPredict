@@ -9,13 +9,7 @@ if(Today %in% c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")) 
   
   rmarkdown::render(paste0(paths$path.report,"/MarketAnalysis.Rmd"))
   
-  # Automatically Push to Git Hub Pages
-    N  <- as.character(now())
-    repo <- repository("D:/Documents/R/RForest_EquitiesPredict/")
-    config(repo, user.name="eric-kruger", user.email="esk@unm.edu")
-    add(repo,"*.*")
-    commit(repo,N)
-    system("git push")
+ 
 
   if(is.na(personal)==TRUE) {
     #Google Credentials
@@ -61,6 +55,14 @@ if(Today %in% c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")) 
                      debug=FALSE)
     
   }
+  
+  # Automatically Push to Git Hub Pages
+  N  <- as.character(now())
+  repo <- repository("D:/Documents/R/RForest_EquitiesPredict/")
+  config(repo, user.name="eric-kruger", user.email="esk@unm.edu")
+  add(repo,"*.*")
+  commit(repo,N)
+  system("git push")
   
 }
 #Print the last analysis
