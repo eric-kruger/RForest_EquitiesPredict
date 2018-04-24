@@ -62,8 +62,7 @@ if(Today %in% c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")) 
   config(repo, user.name="eric-kruger", user.email="esk@unm.edu")
   add(repo,"*.*")
   commit(repo,N)
-  system("git push")
-  
+
 }
 #Print the last analysis
   print(tab.email.t)
