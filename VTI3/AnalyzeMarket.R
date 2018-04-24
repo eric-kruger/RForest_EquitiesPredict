@@ -13,7 +13,7 @@ if(Today %in% c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")) 
     N  <- as.character(now())
     repo <- repository("D:/Documents/R/RForest_EquitiesPredict/")
     config(repo, user.name="eric-kruger", user.email="esk@unm.edu")
-    add(repo,".")
+    add(repo,"*.*")
     commit(repo,N)
     system("git push")
 
